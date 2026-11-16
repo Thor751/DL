@@ -1,0 +1,91 @@
+These viva questions and concise answers are organized assignment-by-assignment based on the SPPU Final Year IT Deep Learning practical syllabus.
+
+### 1. Study of Deep Learning Packages (TensorFlow, Keras, Theano, PyTorch)
+
+* **What is the fundamental difference between TensorFlow and Keras?**
+TensorFlow is an end-to-end, low-level open-source deep learning platform that handles tensor operations, automatic differentiation, and hardware acceleration (CPU/GPU/TPU). Keras is a high-level neural network API (now tightly integrated as `tf.keras`) designed for rapid prototyping and ease of use, running on top of backend engines like TensorFlow.
+* **How do static computation graphs (Theano, TensorFlow 1.x) differ from dynamic computation graphs (PyTorch, TensorFlow 2.x Eager Execution)?**
+Static graphs require you to define the entire network architecture and compile it before running data through it (Define-and-Run). Dynamic graphs build the graph on the fly as operations execute (Define-by-Run), making debugging with standard Python tools much easier and allowing variable-length inputs.
+* **What is a Tensor, and how does it differ from a NumPy array?**
+A tensor is a multi-dimensional array used to represent data in deep learning. Unlike NumPy arrays, tensors can be moved to and processed on GPUs/TPUs for parallel computation and can track operations to automatically compute gradients during backpropagation.
+* **Why was Theano largely discontinued, and what was its major contribution?**
+Theano was discontinued in 2017 because industry-backed frameworks (TensorFlow, PyTorch) overtook it in features and multi-GPU support. However, it pioneered symbolic differentiation and GPU-accelerated computation graphs, influencing almost all modern frameworks.
+* **When would you prefer PyTorch over TensorFlow/Keras?**
+PyTorch is often preferred in academic research and custom architectures due to its Pythonic nature, dynamic computation graphs, and granular control over the training loop. TensorFlow/Keras is frequently chosen for rapid prototyping and seamless production deployment (e.g., TensorFlow Serving, TFLite).
+
+---
+
+### 2. Feedforward Neural Networks (FNN) with Keras & TensorFlow
+
+* **Why do we normalize pixel values (e.g., dividing by 255.0) before feeding MNIST or CIFAR-10 images into a neural network?**
+Scaling pixel values from $[0, 255]$ to $[0, 1]$ keeps input features on a uniform, small scale. This prevents large gradient updates, speeds up convergence during gradient descent, and avoids numerical instability.
+* **Why do we flatten 2D images (like $28 \times 28$ MNIST digits) in a Feedforward Neural Network?**
+Standard Dense (fully connected) layers expect a 1D feature vector per sample. Flattening converts a $28 \times 28$ matrix into a 784-element 1D vector so every pixel connects to every neuron in the first hidden layer.
+* **What is the role of activation functions like ReLU and Softmax in this network?**
+**ReLU** ($f(x) = \max(0, x)$) introduces non-linearity in hidden layers so the network can learn complex patterns while avoiding the vanishing gradient problem. **Softmax** is used in the output layer for multi-class classification to convert raw logits into a probability distribution summing to 1.
+* **How does Stochastic Gradient Descent (SGD) differ from Batch Gradient Descent?**
+Batch Gradient Descent computes the gradient using the entire dataset before making one weight update (slow and memory-heavy). SGD updates weights incrementally using a single sample or a small mini-batch at a time, making training faster and helping escape local minima.
+* **How do you identify overfitting from your training loss and accuracy plots?**
+Overfitting occurs when training loss continues to decrease and training accuracy approaches 100%, while **validation loss starts increasing** and validation accuracy plateaus or drops.
+
+---
+
+### 3. Image Classification Model (4-Stage Pipeline)
+
+* **Why are Convolutional Neural Networks (CNNs) better suited for image classification than Feedforward Neural Networks?**
+FNNs lose spatial relationships when images are flattened and require a massive number of parameters. CNNs preserve 2D spatial hierarchies using local receptive fields (filters) and **parameter sharing**, dramatically reducing weights while detecting edges, textures, and objects regardless of position.
+* **What is the purpose of a Pooling layer (e.g., MaxPooling2D)?**
+Pooling downsamples feature maps to reduce spatial dimensions (width and height), which decreases computational load, controls overfitting, and provides **translation invariance** (slight shifts in pixel position don't change the pooled output).
+* **Difference between `categorical_crossentropy` and `sparse_categorical_crossentropy`?**
+Both compute the same cross-entropy loss for multi-class classification. Use `categorical_crossentropy` when target labels are **one-hot encoded** (e.g., `[0, 0, 1]`), and `sparse_categorical_crossentropy` when labels are **integers** (e.g., `2`).
+* **What is Data Augmentation, and why is it used in Stage 1 (Preprocessing)?**
+Data augmentation artificially expands the training dataset by applying random transformations (rotations, flips, zooms, shifts) to existing images, helping the model generalize better and reducing overfitting.
+* **Why do we evaluate the model on a separate test set rather than the validation set?**
+The validation set is used during training to tune hyperparameters and make architectural decisions, which can indirectly leak information. The test set remains completely unseen until the very end to provide an unbiased estimate of real-world performance.
+
+---
+
+### 4. Autoencoder for Anomaly Detection
+
+* **What is an Autoencoder, and why is it considered self-supervised/unsupervised?**
+An autoencoder is a neural network trained to copy its input to its output through a compressed bottleneck. It requires no manual class labels—the input data itself serves as the target label ($y = x$).
+* **Explain the roles of the Encoder, Bottleneck (Latent Space), and Decoder.**
+The **Encoder** compresses high-dimensional input into a lower-dimensional representation. The **Bottleneck** holds this compressed latent vector, forcing the network to retain only the most salient features. The **Decoder** reconstructs the original input from the latent representation.
+* **How does an Autoencoder detect anomalies if it is only trained on normal data?**
+Because the model only learns the patterns and correlations of normal data, it reconstructs normal inputs with very low error. When presented with an anomalous input, it fails to reconstruct it accurately, resulting in a high **reconstruction error** (e.g., MSE or MAE).
+* **How do you determine the threshold for classifying an input as an anomaly?**
+Typically, you compute the reconstruction errors on a validation set of normal data and set the threshold statistically—such as $\text{Mean} + (2 \text{ or } 3) \times \text{Standard Deviation}$, or at a specific percentile (e.g., 95th or 99th percentile).
+* **What happens if the latent space dimension is equal to or larger than the input dimension?**
+Without additional constraints (like sparsity or noise), an overcomplete autoencoder can simply learn the identity function—memorizing and copying the input directly without extracting meaningful features.
+
+---
+
+### 5. Continuous Bag of Words (CBOW) Model
+
+* **What is the core objective of the CBOW model in Word2Vec?**
+CBOW predicts a **target (center) word** given its surrounding **context words** within a fixed window size (the exact inverse of the Skip-gram model, which predicts context words from a center word).
+* **Why is CBOW called "Bag of Words"?**
+Because the order of the surrounding context words within the window does not matter; their embedding vectors are averaged or summed together before predicting the center word.
+* **How do you extract the learned word embeddings once the CBOW model is trained?**
+The learned word embeddings are simply the **weight matrix** between the input layer (one-hot encoded words of size $V$) and the hidden projection layer (of embedding size $N$), giving a $V \times N$ lookup table.
+* **What is the role of the window size hyperparameter?**
+Window size defines how many words before and after the target word are considered context. Smaller windows capture syntactic relationships (e.g., parts of speech), while larger windows capture broader semantic/topic relationships.
+* **Why do we use Negative Sampling or Hierarchical Softmax in large-vocabulary CBOW models?**
+Computing a standard Softmax denominator requires summing over the entire vocabulary (often hundreds of thousands of words) for every training step, which is computationally prohibitive. Negative sampling approximates this by updating weights for the true target word and only a small sample of random incorrect words.
+
+---
+
+### 6. Object Detection / Classification using Transfer Learning
+
+* **What is Transfer Learning, and why is it effective for CNNs?**
+Transfer learning reuses a model pre-trained on a massive dataset (like ImageNet with 1.4 million images) as the starting point for a new, related task. It works because early CNN layers learn universal visual features (edges, corners, color blobs) that apply to almost any image dataset.
+* **Why do we freeze the lower convolutional layers before training on our custom dataset?**
+Freezing sets `layer.trainable = False` so backpropagation does not update their weights. This preserves the general low-level feature extractors learned on ImageNet and prevents the randomly initialized new classifier head from sending large, destructive gradients back into the pre-trained layers.
+* **What happens when we replace the top layers of a pre-trained model (e.g., `include_top=False`)?**
+`include_top=False` removes the original fully connected classification layers (which were built for ImageNet's 1,000 classes), allowing us to attach a custom Global Average Pooling layer and Dense layers tailored to our specific number of output classes.
+* **What is Fine-Tuning, and why must we use a very low learning rate during this phase?**
+Fine-tuning involves unfreezing some of the top convolutional blocks of the pre-trained base after the custom classifier has converged, and training them jointly. A very low learning rate (e.g., $10^{-5}$) is critical so weight updates only slightly adapt the pre-trained features to your dataset without overfitting or wiping out prior knowledge.
+* **Name a few standard pre-trained CNN architectures used for transfer learning and one key feature of each.**
+* **VGG16:** Uniform architecture using stacked $3 \times 3$ convolution filters; simple but heavy in parameters.
+* **ResNet50:** Introduces **skip (residual) connections** to solve the vanishing gradient problem in very deep networks.
+* **MobileNet:** Uses **depthwise separable convolutions** to make the model lightweight and fast for mobile/edge devices.
