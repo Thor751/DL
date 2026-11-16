@@ -1,0 +1,175 @@
+The theory write-ups for all six SPPU Final Year IT Deep Learning practicals are structured cleanly with **Aim**, **Theory**, and **Conclusion** so you can write them directly onto your practical answer sheets.
+
+---
+
+### Practical 1: Study of Deep Learning Packages (TensorFlow, Keras, Theano, and PyTorch)
+
+**Aim:** To study and document the distinct features, architecture, and functionality of major Deep Learning frameworks: TensorFlow, Keras, Theano, and PyTorch.
+
+**Theory:**
+Deep Learning frameworks provide pre-built abstractions for designing, training, and deploying Artificial Neural Networks (ANNs) without manually coding complex matrix calculus and GPU memory management.
+
+1. **TensorFlow:**
+* **Developer:** Google Brain Team.
+* **Architecture:** Uses both static computation graphs (TF 1.x) and Eager Execution / dynamic graphs (TF 2.x).
+* **Key Features:** Supports distributed computing across CPUs, GPUs, and TPUs; includes **TensorBoard** for visual monitoring, **TensorFlow Lite (TFLite)** for mobile/edge deployment, and **TensorFlow Extended (TFX)** for production pipelines.
+
+
+2. **Keras:**
+* **Developer:** François Chollet (now integrated as `tf.keras`).
+* **Architecture:** High-level neural network API running on top of low-level backends like TensorFlow.
+* **Key Features:** Designed for human readability, modularity, and rapid prototyping. Allows building complex models using the **Sequential API** or **Functional API** in minimal lines of code.
+
+
+3. **Theano:**
+* **Developer:** MILA (Montreal Institute for Learning Algorithms).
+* **Architecture:** Symbolic math compiler that defines, optimizes, and evaluates mathematical expressions involving multi-dimensional arrays using static computation graphs.
+* **Key Features:** Pioneered automatic symbolic differentiation and transparent GPU execution. (Development ceased in 2017 after TensorFlow and PyTorch became industry standards).
+
+
+4. **PyTorch:**
+* **Developer:** Meta (Facebook) AI Research.
+* **Architecture:** Built around dynamic computation graphs (**Define-by-Run**), meaning the graph is constructed on the fly during forward execution.
+* **Key Features:** Highly Pythonic, integrates seamlessly with Python debuggers, offers native support via **TorchScript** for production, and is widely preferred in academic research for custom model architectures.
+
+
+
+**Comparison Summary:**
+
+| Feature | TensorFlow | Keras | Theano | PyTorch |
+| --- | --- | --- | --- | --- |
+| **Abstraction Level** | Low & High-level | High-level API | Low-level | Low & High-level |
+| **Computation Graph** | Dynamic (Eager) & Static | Backend-dependent | Static | Dynamic (Define-by-Run) |
+| **Debugging Ease** | Moderate (TF 2.x improved) | Very Easy | Difficult | Very Easy (Standard Python) |
+| **Primary Use Case** | Enterprise & Production | Rapid Prototyping | Legacy / Academic History | Research & Custom Models |
+
+**Conclusion:** Selecting a deep learning package depends on project requirements—Keras/TensorFlow excels in rapid prototyping and scalable production deployment, while PyTorch provides unmatched flexibility and debugging ease for custom research architectures.
+
+---
+
+### Practical 2: Implementing Feedforward Neural Networks with Keras and TensorFlow
+
+**Aim:** To implement, train, and evaluate a Feedforward Neural Network (FNN) on image datasets (MNIST / CIFAR-10) using Keras and TensorFlow.
+
+**Theory:**
+A **Feedforward Neural Network (FNN)**, also known as a Multi-Layer Perceptron (MLP), is an artificial neural network where information moves strictly in one direction—from the input layer, through one or more hidden layers, to the output layer—without any cycles or feedback loops.
+
+* **Architecture & Components:**
+1. **Input & Flattening Layer:** Multi-dimensional image inputs (e.g., $28 \times 28$ grayscale MNIST images) are flattened into a 1D feature vector ($784$ inputs) so every pixel connects to the first dense layer. Pixel intensities $[0, 255]$ are normalized to $[0, 1]$ for stable gradient convergence.
+2. **Dense (Fully Connected) Hidden Layers:** Each neuron computes a weighted sum of inputs plus a bias ($z = \sum w_i x_i + b$) and passes it through a non-linear activation function like **ReLU** ($\max(0, z)$) to learn complex patterns and prevent vanishing gradients.
+3. **Output Layer:** Uses the **Softmax** activation function to convert raw logits into a probability distribution across target classes ($\sum P_i = 1$).
+
+
+* **Training with SGD & Backpropagation:**
+* **Loss Function:** Categorical Cross-Entropy measures the divergence between predicted probabilities and true class labels.
+* **Stochastic Gradient Descent (SGD):** Updates network weights iteratively using gradients computed on mini-batches of data ($\theta = \theta - \eta \nabla_\theta J(\theta)$), offering faster convergence and better generalization than full-batch gradient descent.
+
+
+* **Performance Visualization:** Plotting training vs. validation loss and accuracy curves across epochs helps diagnose model behavior—specifically identifying **underfitting** (high loss on both) or **overfitting** (training loss drops while validation loss rises).
+
+**Conclusion:** A Feedforward Neural Network was successfully implemented using TensorFlow and Keras, demonstrating how dense layers, ReLU/Softmax activations, and SGD optimization classify multi-class image data.
+
+---
+
+### Practical 3: Image Classification Model using a 4-Stage Pipeline
+
+**Aim:** To build and evaluate a Convolutional Neural Network (CNN) based image classification model structured into four distinct stages: data preprocessing, model definition, training, and performance estimation.
+
+**Theory:**
+Unlike standard Feedforward Neural Networks, **Convolutional Neural Networks (CNNs)** preserve the 2D spatial structure of images and drastically reduce trainable parameters through local connectivity and weight sharing.
+
+* **Stage 1: Loading and Preprocessing Image Data**
+* Raw images are loaded, resized to uniform dimensions, and normalized (scaled to $[0, 1]$).
+* Labels are encoded (one-hot encoding or integer encoding), and **Data Augmentation** (random rotations, flips, shifts) may be applied to prevent overfitting.
+
+
+* **Stage 2: Defining the Model’s Architecture**
+* **Convolutional Layers (`Conv2D`):** Slide learnable filters (kernels) across the input image to generate feature maps detecting low-level edges and high-level shapes.
+* **Pooling Layers (`MaxPooling2D`):** Downsample feature maps spatially, reducing computational cost and providing translation invariance.
+* **Flattening & Dense Layers:** Flatten extracted 2D feature maps into a 1D vector followed by Dense layers and a Softmax output layer for final classification.
+
+
+* **Stage 3: Training the Model**
+* The model is compiled with an optimizer (such as **Adam** or **SGD**), a cross-entropy loss function, and accuracy metrics, then fitted over multiple epochs using training and validation splits.
+
+
+* **Stage 4: Estimating the Model’s Performance**
+* The trained model is evaluated on an unseen **test dataset** using metrics such as Test Accuracy, Loss, Precision, Recall, F1-Score, and a **Confusion Matrix** to verify generalization.
+
+
+
+**Conclusion:** Dividing image classification into a structured four-stage CNN pipeline ensures clean data handling, effective spatial feature extraction, and unbiased performance evaluation.
+
+---
+
+### Practical 4: Anomaly Detection using Autoencoders
+
+**Aim:** To build and train an Autoencoder neural network to detect anomalies in a dataset based on reconstruction error.
+
+**Theory:**
+An **Autoencoder** is an unsupervised (self-supervised) artificial neural network trained to reconstruct its input at its output layer ($y \approx x$) after passing the data through a compressed intermediate representation.
+
+* **Architecture:**
+1. **Encoder:** A series of decreasingly sized neural network layers that compress high-dimensional input data $x$ into a compact lower-dimensional vector $z$ ($z = f(x)$).
+2. **Latent Space (Bottleneck):** The central layer holding the compressed representation. Because its dimensionality is strictly smaller than the input, the network is forced to discard noise and retain only essential structural features.
+3. **Decoder:** A symmetrical series of expanding layers that reconstructs the original input $\hat{x}$ from the latent representation ($\hat{x} = g(z)$).
+
+
+* **Compilation & Loss:** Compiled using optimizers like **Adam** and reconstruction loss functions such as **Mean Squared Error (MSE)** or **Mean Absolute Error (MAE)**:
+
+$$\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (x_i - \hat{x}_i)^2$$
+
+
+* **Anomaly Detection Mechanism:**
+* The autoencoder is trained **exclusively on normal (non-anomalous) data**.
+* During inference, normal instances yield a very **low reconstruction error**, whereas anomalous instances—having patterns never seen during training—produce a **high reconstruction error**.
+* A statistical threshold (e.g., $\mu + 2\sigma$ or the 95th percentile of validation reconstruction loss) separates normal samples from anomalies.
+
+
+
+**Conclusion:** Autoencoders effectively identify outliers without requiring labeled anomaly data by learning compact representations of normal patterns and flagging inputs with high reconstruction error.
+
+---
+
+### Practical 5: Continuous Bag of Words (CBOW) Model
+
+**Aim:** To implement the Continuous Bag of Words (CBOW) Word2Vec architecture to generate dense vector representations (word embeddings) from text data.
+
+**Theory:**
+In Natural Language Processing (NLP), traditional **One-Hot Encoding** creates high-dimensional, sparse vectors that fail to capture semantic similarity between words. **Word2Vec** solves this by learning dense, low-dimensional continuous vector representations (**word embeddings**) where semantically similar words lie close together in vector space.
+
+* **CBOW Architecture & Mechanism:**
+* **Objective:** CBOW predicts a **target (center) word** $w_t$ given its surrounding **context words** ($w_{t-c}, \dots, w_{t-1}, w_{t+1}, \dots, w_{t+c}$) within a fixed window size $c$.
+* **"Bag of Words" Property:** The order of context words inside the window is ignored; their projected embedding vectors are averaged into a single context vector before prediction.
+
+
+* **Implementation Stages:**
+1. **Data Preparation:** Clean the text corpus (lowercasing, removing punctuation/stopwords), tokenize words, and build a vocabulary mapping each unique word to an integer index ($V$).
+2. **Generate Training Data:** Slide a context window across tokenized sentences to create `(context_words, target_word)` pairs.
+3. **Model Architecture & Training:** Consists of an **Input/Embedding Layer** (lookup matrix of size $V \times N$, where $N$ is embedding dimension), a **Lambda/Averaging Layer** that averages context vectors, and a **Dense Softmax Output Layer** of size $V$ trained with categorical cross-entropy loss.
+4. **Output Extraction:** Once trained, the weight matrix of the Embedding layer serves as the learned word embedding table, allowing similarity queries via **Cosine Similarity**.
+
+
+
+**Conclusion:** The CBOW model efficiently learns dense semantic word embeddings by predicting center words from surrounding context vectors, capturing linguistic relationships in continuous vector space.
+
+---
+
+### Practical 6: Object Detection / Classification using Transfer Learning of CNN Architectures
+
+**Aim:** To implement image classification / object recognition by applying Transfer Learning and Fine-Tuning on a pre-trained CNN architecture.
+
+**Theory:**
+Training deep Convolutional Neural Networks from scratch requires massive labeled datasets and extensive GPU compute. **Transfer Learning** overcomes this by reusing a CNN model pre-trained on a large benchmark dataset (such as **ImageNet**, containing 1.4 million images across 1,000 classes) as the feature extraction backbone for a new, smaller target dataset.
+
+* **Why Transfer Learning Works:** Early convolutional layers learn universal low-level visual features (edges, corners, color gradients, textures) applicable across almost all visual domains, whereas deeper layers learn dataset-specific object parts.
+* **Implementation Workflow:**
+1. **Load Pre-trained Base Model:** Load an established architecture (e.g., **VGG16**, **ResNet50**, or **MobileNet**) with pre-trained ImageNet weights while excluding its original top classification head (`include_top=False`).
+2. **Freeze Lower Convolutional Layers:** Set `layer.trainable = False` on the base layers so backpropagation does not alter pre-learned weights or destroy extracted features with large initial gradients.
+3. **Add Custom Classifier Head:** Attach a `GlobalAveragePooling2D` or `Flatten` layer followed by custom `Dense` layers and a final output layer matching the target dataset's class count.
+4. **Train Classifier Layers:** Train only the newly added top layers on the target dataset until validation accuracy stabilizes.
+5. **Fine-Tuning:** Unfreeze the top convolutional blocks of the base model and retrain the entire network jointly using a **very low learning rate** (e.g., $10^{-5}$) to gently adapt high-level features to the custom domain without overfitting.
+
+
+
+**Conclusion:** Transfer learning significantly reduces training time and data requirements while achieving high accuracy by adapting pre-trained CNN feature extractors to custom classification tasks.
